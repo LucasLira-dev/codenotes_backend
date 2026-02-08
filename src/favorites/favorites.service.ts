@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
@@ -14,8 +15,13 @@ export class FavoritesService {
     const note = await this.prisma.notes.findUnique({
       where: { id: dto.noteId },
     });
+    
     if (!note) {
       throw new NotFoundException('Note not found!');
+    }
+
+    if (!note.isPublic && note.authorId !== userId) {
+      throw new NotFoundException('Note not found or is private!');
     }
 
     const existing = await this.prisma.favorite.findFirst({
@@ -29,6 +35,10 @@ export class FavoritesService {
       throw new ConflictException('This note is already in your favorites.');
     }
 
+    if(!note.isPublic) {
+      throw new UnauthorizedException('You are not authorized to favorite this note.');
+    }
+    
     const favorite = await this.prisma.favorite.create({
       data: {
         userId,
@@ -40,7 +50,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Nota adicionada aos favoritos',
+      message: 'Note added to favorites successfully!',
       favorite,
     };
   }
