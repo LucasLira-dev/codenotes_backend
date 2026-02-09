@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { UpdateVisibilityDto } from './dto/update-visibility.dto';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous, Session, type UserSession } from '@thallesp/nestjs-better-auth';
 
 
 @Controller('notes')
@@ -27,8 +27,9 @@ export class NotesController {
   }
 
   @Get('publicNotes')
-  findAllPublicNotes() {
-    return this.notesService.findPublicNotes();
+  @AllowAnonymous()
+  findAllPublicNotes(@Session({ optional: true }) session?: UserSession) {
+    return this.notesService.findPublicNotes(session?.user?.id);
   }
 
   @Patch(':id/visibility')
@@ -38,6 +39,14 @@ export class NotesController {
     @Session() session: UserSession,
   ) {
     return this.notesService.updateVisibility(id, dto.isPublic, session.user.id);
+  }
+
+  @Get('search')
+  searchNotes(
+    @Query('search') search: string,
+    @Session() session: UserSession,
+  ) {
+    return this.notesService.searchNotes(search, session?.user?.id);
   }
 
   @Get(':id')

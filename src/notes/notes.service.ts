@@ -31,17 +31,26 @@ export class NotesService {
     })
   }
 
-  async findPublicNotes() {
+  async findPublicNotes(userId?: string) {
     const notes = await this.prisma.notes.findMany({
       where: {
         isPublic: true,
       },
       include: {
         author: true,
+        favorites: userId ? {
+          where: {
+            userId,
+          },
+        } : false,
       },
     });
 
-    return notes;
+    return notes.map(note => ({
+      ...note,
+      isFavorited: note.favorites?.length > 0 || false,
+      favorites: undefined,
+    }));
   }
 
   async findOne(id: string) {
@@ -56,6 +65,36 @@ export class NotesService {
     }
 
     return note;
+  }
+
+  async searchNotes(search: string, userId: string) {
+    search = search?.trim();
+
+    return await this.prisma.notes.findMany({
+      where: {
+        authorId: userId,
+        OR: [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            code: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            language: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
   }
 
   async update(id: string, updateNoteDto: UpdateNoteDto, userId: string) {

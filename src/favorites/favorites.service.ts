@@ -31,8 +31,16 @@ export class FavoritesService {
       },
     });
     
+    // Toggle behavior: if already favorited, remove it
     if (existing) {
-      throw new ConflictException('This note is already in your favorites.');
+      await this.prisma.favorite.delete({
+        where: { id: existing.id },
+      });
+
+      return {
+        message: 'Note removed from favorites successfully!',
+        isFavorited: false,
+      };
     }
 
     if(!note.isPublic) {
@@ -52,6 +60,7 @@ export class FavoritesService {
     return {
       message: 'Note added to favorites successfully!',
       favorite,
+      isFavorited: true,
     };
   }
 
