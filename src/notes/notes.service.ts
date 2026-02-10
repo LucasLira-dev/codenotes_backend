@@ -1,15 +1,18 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class NotesService {
-
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createNoteDto: CreateNoteDto, userId: string) {
-     const note = await this.prisma.notes.create({
+    const note = await this.prisma.notes.create({
       data: {
         ...createNoteDto,
         authorId: userId,
@@ -27,8 +30,8 @@ export class NotesService {
       where: {
         authorId: userId,
       },
-      orderBy: { createdAt: 'desc' }
-    })
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async findPublicNotes(userId?: string) {
@@ -38,15 +41,17 @@ export class NotesService {
       },
       include: {
         author: true,
-        favorites: userId ? {
-          where: {
-            userId,
-          },
-        } : false,
+        favorites: userId
+          ? {
+              where: {
+                userId,
+              },
+            }
+          : false,
       },
     });
 
-    return notes.map(note => ({
+    return notes.map((note) => ({
       ...note,
       isFavorited: note.favorites?.length > 0 || false,
       favorites: undefined,
@@ -57,11 +62,11 @@ export class NotesService {
     const note = await this.prisma.notes.findFirst({
       where: {
         id,
-      }
-    })
+      },
+    });
 
-    if (!note){
-      throw new NotFoundException('Note not found!')
+    if (!note) {
+      throw new NotFoundException('Note not found!');
     }
 
     return note;
@@ -104,12 +109,14 @@ export class NotesService {
       },
     });
 
-    if (!existingNote){
-      throw new NotFoundException('Note not found!')
+    if (!existingNote) {
+      throw new NotFoundException('Note not found!');
     }
 
-    if (existingNote.authorId !== userId){
-      throw new ForbiddenException('You do not have permission to update this note.')
+    if (existingNote.authorId !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to update this note.',
+      );
     }
 
     return await this.prisma.notes.update({
@@ -127,7 +134,9 @@ export class NotesService {
       throw new NotFoundException('Note not found!');
     }
     if (existingNote.authorId !== userId) {
-      throw new ForbiddenException('You cannot update the visibility of a note that is not yours.');
+      throw new ForbiddenException(
+        'You cannot update the visibility of a note that is not yours.',
+      );
     }
 
     return await this.prisma.notes.update({
@@ -148,11 +157,11 @@ export class NotesService {
     await this.prisma.notes.delete({
       where: {
         id,
-      }
-    })
+      },
+    });
 
     return {
-      message: 'Note deleted with sucessfull!'
-    }
+      message: 'Note deleted with sucessfull!',
+    };
   }
 }

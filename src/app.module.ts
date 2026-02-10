@@ -9,10 +9,11 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    AuthModule.forRoot({auth}),
-    ConfigModule.forRoot({isGlobal: true}),
-    NotesModule, 
-    FavoritesModule],
+    AuthModule.forRoot({ auth }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    NotesModule,
+    FavoritesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

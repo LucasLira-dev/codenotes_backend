@@ -22,6 +22,8 @@ export class CreateNoteDto {
   @IsString()
   @IsNotEmpty({ message: 'A linguagem é obrigatória' })
   @MaxLength(50, { message: 'A linguagem deve ter no máximo 50 caracteres' })
-  @Matches(/\S/, { message: 'A linguagem não pode ser apenas espaços em branco' })
+  @Matches(/\S/, {
+    message: 'A linguagem não pode ser apenas espaços em branco',
+  })
   language: string;
 }

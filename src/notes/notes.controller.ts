@@ -1,10 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { UpdateVisibilityDto } from './dto/update-visibility.dto';
-import { AllowAnonymous, Session, type UserSession } from '@thallesp/nestjs-better-auth';
-
+import {
+  AllowAnonymous,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 
 @Controller('notes')
 export class NotesController {
@@ -14,16 +26,13 @@ export class NotesController {
   create(
     @Body() createNoteDto: CreateNoteDto,
     @Session() session: UserSession,
-    )
-     {
+  ) {
     return this.notesService.create(createNoteDto, session.user.id);
   }
 
   @Get()
-  findMyNotes(
-    @Session() session: UserSession,
-  ) {
-    return this.notesService.findMyNotes(session.user.id)
+  findMyNotes(@Session() session: UserSession) {
+    return this.notesService.findMyNotes(session.user.id);
   }
 
   @Get('publicNotes')
@@ -38,7 +47,11 @@ export class NotesController {
     @Body() dto: UpdateVisibilityDto,
     @Session() session: UserSession,
   ) {
-    return this.notesService.updateVisibility(id, dto.isPublic, session.user.id);
+    return this.notesService.updateVisibility(
+      id,
+      dto.isPublic,
+      session.user.id,
+    );
   }
 
   @Get('search')
@@ -56,7 +69,7 @@ export class NotesController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() updateNoteDto: UpdateNoteDto,
     @Session() session: UserSession,
   ) {
@@ -64,10 +77,7 @@ export class NotesController {
   }
 
   @Delete(':id')
-  remove(
-    @Param('id') id: string,
-    @Session() session: UserSession,
-  ) {
+  remove(@Param('id') id: string, @Session() session: UserSession) {
     return this.notesService.remove(id, session.user.id);
   }
 }
