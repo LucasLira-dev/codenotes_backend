@@ -6,6 +6,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './auth/auth.config';
 import { ConfigModule } from '@nestjs/config';
+import { RagModule } from './rag/rag.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({ isGlobal: true }),
     NotesModule,
     FavoritesModule,
+    RagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
