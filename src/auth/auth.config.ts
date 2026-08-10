@@ -52,6 +52,9 @@ export const auth = betterAuth({
       sameSite: 'None',
       secure: true,
     },
+    session: {
+      storeSessionInCookie: true,
+    },
   },
   socialProviders: {
     github: {
